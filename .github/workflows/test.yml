@@ -17,3 +17,9 @@ jobs:
         with:
           node-version: '22'
       - run: npm install && npm run build
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resolved-dependencies
+          path: |
+            composer.lock
+            package-lock.json

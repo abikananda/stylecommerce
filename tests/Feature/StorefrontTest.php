@@ -14,7 +14,7 @@ class StorefrontTest extends TestCase {
     public function test_admin_product_form_and_order_list_render():void {
         $admin=User::create(['name'=>'Admin','email'=>'admin@example.com','password'=>'password']);$admin->forceFill(['is_admin'=>true])->save();
         $this->actingAs($admin)->get('/admin')->assertOk();
-        $this->actingAs($admin)->get('/admin/products/'.Product::first()->id.'/edit')->assertOk();
+        $this->actingAs($admin)->get('/admin/products/'.Product::first()->slug.'/edit')->assertOk();
         $this->actingAs($admin)->get('/admin/orders')->assertOk();
     }
 }
