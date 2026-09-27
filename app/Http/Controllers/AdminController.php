@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Mail\OrderUpdate;
 use App\Services\Refunds;
+use App\Services\Images;
 class AdminController extends Controller {
     public function index(){return view('admin.index',['orders'=>Order::latest()->limit(10)->get(),'revenue'=>Order::whereIn('status',['paid','processing','shipped','delivered'])->sum('total_paise'),'lowStock'=>ProductVariant::whereRaw('stock - reserved <= 5')->with('product')->get(),'customers'=>User::where('is_admin',false)->count(),'enquiries'=>Enquiry::latest()->limit(10)->get()]);}
     public function products(){return view('admin.products',['products'=>Product::with('category','variants')->latest()->paginate(30)]);}
@@ -21,15 +22,16 @@ class AdminController extends Controller {
             foreach($data['variants'] as $v){
                 $variant=isset($v['id']) ? $product->variants()->whereKey($v['id'])->firstOrFail() : new ProductVariant(['product_id'=>$product->id]);
                 if($variant->exists && $v['stock']<$variant->reserved) throw \Illuminate\Validation\ValidationException::withMessages(['variants'=>'Stock cannot be below reserved quantity.']);
+                if (ProductVariant::where('sku',$v['sku'])->where('id','!=',$variant->id??0)->exists()) throw \Illuminate\Validation\ValidationException::withMessages(['variants'=>'SKU '.$v['sku'].' is already in use.']);
                 $variant->fill(collect($v)->except('id')->all());$variant->save();$keep[]=$variant->id;
             }
             if($product->variants()->whereNotIn('id',$keep)->where('reserved','>',0)->exists()) throw \Illuminate\Validation\ValidationException::withMessages(['variants'=>'Reserved variants cannot be removed.']);
             $product->variants()->whereNotIn('id',$keep)->delete();
         });return redirect()->route('admin.products')->with('message','Product saved.');
     }
-    public function uploadImages(Request $request,Product $product){
+    public function uploadImages(Request $request,Product $product,Images $images){
         $data=$request->validate(['images'=>'required|array|max:8','images.*'=>'required|image|mimes:jpg,jpeg,png,webp|max:4096','alt'=>'required|string|max:200']);
-        foreach($data['images'] as $file){$path=$file->store('products','public');$product->images()->create(['path'=>$path,'alt'=>$data['alt'],'position'=>($product->images()->max('position')??0)+1]);}
+        foreach($data['images'] as $file){$path=$images->store($file);$product->images()->create(['path'=>$path,'alt'=>$data['alt'],'position'=>($product->images()->max('position')??0)+1]);}
         return back()->with('message','Images uploaded.');
     }
     public function deleteImage(ProductImage $image){Storage::disk('public')->delete($image->path);$image->delete();return back();}
@@ -53,4 +55,10 @@ class AdminController extends Controller {
     }
     public function coupons(){return view('admin.coupons',['coupons'=>Coupon::latest()->get()]);}
     public function saveCoupon(Request $request){$data=$request->validate(['code'=>'required|alpha_dash|max:40|unique:coupons,code','type'=>'required|in:fixed,percent','value'=>'required|integer|min:1','min_order_paise'=>'required|integer|min:0','usage_limit'=>'nullable|integer|min:1','expires_at'=>'nullable|date|after:now']);if($data['type']==='percent' && $data['value']>100) return back()->withErrors(['value'=>'Percent cannot exceed 100.']);Coupon::create($data+['active'=>true]);return back();}
+    public function updateCoupon(Request $request,Coupon $coupon){$data=$request->validate(['active'=>'required|boolean']);$coupon->update($data);return back();}
+    public function updateCategory(Request $request,Category $category){$data=$request->validate(['name'=>'required|string|max:100','slug'=>'required|alpha_dash|max:100|unique:categories,slug,'.$category->id,'description'=>'nullable|string|max:2000']);$category->update($data);return back();}
+    public function deleteCategory(Category $category){abort_if($category->products()->exists(),422,'Move or remove products before deleting this category.');$category->delete();return back();}
+    public function updateCollection(Request $request,Collection $collection){$data=$request->validate(['name'=>'required|string|max:100','slug'=>'required|alpha_dash|max:100|unique:collections,slug,'.$collection->id]);$collection->update($data);return back();}
+    public function deleteCollection(Collection $collection){$collection->delete();return back();}
+    public function customers(){return view('admin.customers',['customers'=>User::where('is_admin',false)->withCount('orders')->orderBy('created_at','desc')->paginate(30)]);}
 }

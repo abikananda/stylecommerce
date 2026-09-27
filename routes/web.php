@@ -57,4 +57,10 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::post('/settings',[AdminController::class,'saveSettings'])->name('settings.save');
     Route::get('/coupons',[AdminController::class,'coupons'])->name('coupons');
     Route::post('/coupons',[AdminController::class,'saveCoupon'])->name('coupons.save');
+    Route::patch('/coupons/{coupon}',[AdminController::class,'updateCoupon'])->name('coupons.update');
+    Route::patch('/categories/{category}',[AdminController::class,'updateCategory'])->name('category.update');
+    Route::delete('/categories/{category}',[AdminController::class,'deleteCategory'])->name('category.delete');
+    Route::patch('/collections/{collection}',[AdminController::class,'updateCollection'])->name('collection.update');
+    Route::delete('/collections/{collection}',[AdminController::class,'deleteCollection'])->name('collection.delete');
+    Route::get('/customers',[AdminController::class,'customers'])->name('customers');
 });

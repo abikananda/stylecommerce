@@ -16,5 +16,7 @@ class StorefrontTest extends TestCase {
         $this->actingAs($admin)->get('/admin')->assertOk();
         $this->actingAs($admin)->get('/admin/products/'.Product::first()->slug.'/edit')->assertOk();
         $this->actingAs($admin)->get('/admin/orders')->assertOk();
+        $this->actingAs($admin)->get('/admin/customers')->assertOk();
+        $this->actingAs($admin)->get('/admin/settings')->assertOk();
     }
 }

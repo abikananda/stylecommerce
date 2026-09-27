@@ -4,7 +4,7 @@ Laravel 13 storefront and admin for earrings and bangles, with per-variant stock
 
 ## Local setup
 
-Requirements: PHP 8.3+, Composer 2, Node 22+, MySQL 8+, and a mail transport. Copy `.env.example` to `.env`; set database credentials, `APP_URL`, `ADMIN_EMAIL`, and a strong `ADMIN_PASSWORD` before seeding. Never commit `.env`.
+Requirements: PHP 8.3+ with GD, Composer 2, Node 22+, MySQL 8+, and a mail transport. Copy `.env.example` to `.env`; set database credentials, `APP_URL`, `ADMIN_EMAIL`, and a strong `ADMIN_PASSWORD` before seeding. Never commit `.env`.
 
 ```bash
 composer install
