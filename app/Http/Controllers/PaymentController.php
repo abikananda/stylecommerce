@@ -2,6 +2,7 @@
 namespace App\Http\Controllers;
 use App\Models\{GatewayEvent,Order};
 use App\Services\Payments;
+use App\Services\Refunds;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 class PaymentController extends Controller {
@@ -15,7 +16,7 @@ class PaymentController extends Controller {
         $payments->confirmCaptured($order,$data['razorpay_payment_id']);
         return redirect()->route('order.status',$order);
     }
-    public function webhook(Request $request,Payments $payments) {
+    public function webhook(Request $request,Payments $payments,Refunds $refunds) {
         $raw=$request->getContent();
         abort_unless($payments->verifyWebhook($raw,$request->header('X-Razorpay-Signature','')),403);
         $eventId=$request->header('X-Razorpay-Event-Id'); abort_unless($eventId,400);
@@ -24,6 +25,10 @@ class PaymentController extends Controller {
         if ($event==='payment.captured' && $payment && ($payment['status']??'')==='captured') {
             $order=Order::where('gateway_order_id',$payment['order_id']??'')->first();
             if ($order) $payments->confirmCaptured($order,$payment['id']);
+        }
+        if (in_array($event,['refund.processed','refund.failed'],true)) {
+            $refund=$request->input('payload.refund.entity');
+            if (!empty($refund['id'])) $refunds->sync($refund['id']);
         }
         GatewayEvent::firstOrCreate(['gateway_event_id'=>$eventId],['event_type'=>$event??'unknown']);
         return response()->json(['ok'=>true]);

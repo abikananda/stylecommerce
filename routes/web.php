@@ -37,6 +37,7 @@ Route::middleware('auth')->group(function () {
     Route::delete('/account/addresses/{address}',[AccountController::class,'deleteAddress'])->name('account.address.delete');
     Route::get('/wishlist',[AccountController::class,'wishlist'])->name('wishlist');
     Route::post('/wishlist/{product}',[AccountController::class,'toggleWishlist'])->name('wishlist.toggle');
+    Route::post('/account/orders/{order}/return',[AccountController::class,'requestReturn'])->name('account.return');
 });
 Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
     Route::get('/',[AdminController::class,'index'])->name('index');
@@ -51,6 +52,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::get('/orders',[AdminController::class,'orders'])->name('orders');
     Route::get('/orders/{order}',[AdminController::class,'order'])->name('order');
     Route::post('/orders/{order}/status',[AdminController::class,'orderStatus'])->name('order.status');
+    Route::post('/orders/{order}/refund',[AdminController::class,'refund'])->name('order.refund');
     Route::get('/settings',[AdminController::class,'settings'])->name('settings');
     Route::post('/settings',[AdminController::class,'saveSettings'])->name('settings.save');
     Route::get('/coupons',[AdminController::class,'coupons'])->name('coupons');

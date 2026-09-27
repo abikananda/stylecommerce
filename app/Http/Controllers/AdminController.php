@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use App\Mail\OrderUpdate;
+use App\Services\Refunds;
 class AdminController extends Controller {
     public function index(){return view('admin.index',['orders'=>Order::latest()->limit(10)->get(),'revenue'=>Order::whereIn('status',['paid','processing','shipped','delivered'])->sum('total_paise'),'lowStock'=>ProductVariant::whereRaw('stock - reserved <= 5')->with('product')->get(),'customers'=>User::where('is_admin',false)->count(),'enquiries'=>Enquiry::latest()->limit(10)->get()]);}
     public function products(){return view('admin.products',['products'=>Product::with('category','variants')->latest()->paginate(30)]);}
@@ -40,6 +41,7 @@ class AdminController extends Controller {
         $allowed=['paid'=>['processing'],'processing'=>['shipped'],'shipped'=>['delivered'],'delivered'=>['return_requested'],'return_requested'=>['returned']];
         DB::transaction(function()use($order,$data,$allowed){$locked=Order::whereKey($order->id)->lockForUpdate()->firstOrFail();abort_unless(in_array($data['status'],$allowed[$locked->status]??[],true),422);$from=$locked->status;$locked->update(['status'=>$data['status'],'tracking_number'=>$data['tracking_number']??$locked->tracking_number]);OrderEvent::create(['order_id'=>$locked->id,'actor_id'=>auth()->id(),'from_status'=>$from,'to_status'=>$data['status']]);DB::afterCommit(fn()=>Mail::to($locked->email)->queue(new OrderUpdate($locked->id)));});return back();
     }
+    public function refund(Order $order,Refunds $refunds){$refunds->initiate($order);return back()->with('message','Refund requested. Final status follows Razorpay confirmation.');}
     public function settings(){return view('admin.settings',['settings'=>Setting::pluck('value','key'),'categories'=>Category::all(),'collections'=>Collection::all()]);}
     public function saveSettings(Request $request){
         $data=$request->validate(['brand_name'=>'required|string|max:100','brand_email'=>'nullable|email','brand_phone'=>'nullable|string|max:30','instagram_url'=>'nullable|url','shipping_paise'=>'required|integer|min:0','free_shipping_threshold_paise'=>'required|integer|min:0','tax_rate_bps'=>'required|integer|min:0|max:10000','shipping_pincode_prefixes'=>'nullable|string|max:500','cod_enabled'=>'nullable|boolean','page_about'=>'nullable|string|max:10000','page_contact'=>'nullable|string|max:10000','page_shipping'=>'nullable|string|max:10000','page_returns'=>'nullable|string|max:10000','page_privacy'=>'nullable|string|max:10000','page_terms'=>'nullable|string|max:10000','page_size_guide'=>'nullable|string|max:10000','category_name'=>'nullable|string|max:100','collection_name'=>'nullable|string|max:100']);

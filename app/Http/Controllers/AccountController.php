@@ -3,6 +3,8 @@ namespace App\Http\Controllers;
 use App\Models\{Address,Product};
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use App\Models\Order;
+use App\Models\OrderEvent;
 class AccountController extends Controller {
     public function index(Request $request){return view('store.account',['orders'=>$request->user()->orders()->latest()->with('items')->paginate(10),'addresses'=>$request->user()->addresses]);}
     public function address(Request $request){
@@ -12,4 +14,9 @@ class AccountController extends Controller {
     public function deleteAddress(Request $request,Address $address){abort_unless($address->user_id===$request->user()->id,403);$address->delete();return back();}
     public function wishlist(Request $request){return view('store.wishlist',['products'=>Product::with('images','variants')->whereIn('id',DB::table('wishlists')->where('user_id',$request->user()->id)->pluck('product_id'))->where('published',true)->get()]);}
     public function toggleWishlist(Request $request,Product $product){$query=DB::table('wishlists')->where('user_id',$request->user()->id)->where('product_id',$product->id);if($query->exists())$query->delete();else DB::table('wishlists')->insert(['user_id'=>$request->user()->id,'product_id'=>$product->id]);return back();}
+    public function requestReturn(Request $request,Order $order){
+        abort_unless($order->user_id===$request->user()->id,403);
+        $data=$request->validate(['reason'=>'required|string|min:10|max:1000']);
+        DB::transaction(function()use($order,$data){$locked=Order::whereKey($order->id)->lockForUpdate()->firstOrFail();abort_unless($locked->status==='delivered',422);$locked->update(['status'=>'return_requested']);OrderEvent::create(['order_id'=>$locked->id,'actor_id'=>auth()->id(),'from_status'=>'delivered','to_status'=>'return_requested','note'=>$data['reason']]);});return back()->with('message','Return request submitted.');
+    }
 }
