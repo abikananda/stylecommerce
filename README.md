@@ -28,7 +28,7 @@ The optional COD setting is off by default. When enabled, COD orders move to pro
 
 ## Tests
 
-Run `php artisan test` and `npm run build`. The feature tests use SQLite in memory and fake Razorpay HTTP responses. GitHub Actions runs both commands on pushes and pull requests. Real gateway test credentials and an HTTPS webhook endpoint are still required for an end-to-end Razorpay test transaction.
+Run `php vendor/bin/phpunit` and `npm run build`. The feature tests use SQLite in memory and fake Razorpay HTTP responses. GitHub Actions runs both commands on pushes and pull requests. Real gateway test credentials and an HTTPS webhook endpoint are still required for an end-to-end Razorpay test transaction.
 
 ## Before launch
 

@@ -12,7 +12,7 @@ jobs:
           coverage: none
       - run: mkdir -p bootstrap/cache storage/framework/cache/data storage/framework/sessions storage/framework/views storage/logs && composer install --no-interaction --prefer-dist
       - run: cp .env.example .env && php artisan key:generate
-      - run: php artisan test
+      - run: php vendor/bin/phpunit
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
