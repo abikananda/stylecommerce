@@ -1,0 +1,1 @@
+@extends('layouts.app') @section('title','Wishlist · '.$brand) @section('content')<h1 class="section-title mb-8">Saved pieces</h1><div class="grid-products">@forelse($products as $item)@include('store._card')@empty<p>No saved pieces yet. <a class="underline" href="{{route('shop')}}">Browse the collection</a></p>@endforelse</div>@endsection

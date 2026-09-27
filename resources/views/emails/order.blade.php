@@ -1,0 +1,1 @@
+<h1>Order #{{$order->id}}</h1><p>Your order is now {{str_replace('_',' ',$order->status)}}.</p><p>Total: ₹{{number_format($order->total_paise/100,2)}}</p>@if($order->tracking_number)<p>Tracking number: {{$order->tracking_number}}</p>@endif

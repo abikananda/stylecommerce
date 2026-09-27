@@ -1,0 +1,10 @@
+/vendor
+/node_modules
+/public/build
+/public/storage
+/.env
+/.phpunit.cache
+/storage/*.key
+/storage/logs/*
+!/storage/logs/.gitignore
+/.idea

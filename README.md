@@ -18,7 +18,7 @@ php artisan serve
 
 In separate shells run `php artisan queue:work` and `php artisan schedule:work`. Open `http://localhost:8000`. The admin login is the email and password supplied for seeding, and the admin UI is at `/admin`. Re-running the seeder does not overwrite an existing admin password.
 
-Alternatively, after setting `.env` and `MYSQL_ROOT_PASSWORD`, run `docker compose build`, `docker compose run --rm app php artisan key:generate`, `docker compose up -d`, `docker compose exec app php artisan migrate --seed`, and `docker compose exec app php artisan storage:link`. Use `http://localhost:8000`. Production needs TLS, durable MySQL and image storage, backups, a mail service, and process supervision for the worker and scheduler.
+Alternatively, after setting `.env` (including a generated `APP_KEY` and `MYSQL_ROOT_PASSWORD`), run `docker compose build`, `docker compose up -d`, `docker compose exec app php artisan migrate --seed`, and `docker compose exec app php artisan storage:link`. Generate the key locally using `php artisan key:generate` or `openssl rand -base64 32` prefixed with `base64:`. Use `http://localhost:8000`. Production needs TLS, durable MySQL and image storage, backups, a mail service, and process supervision for the worker and scheduler.
 
 ## Payments
 

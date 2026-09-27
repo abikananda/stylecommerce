@@ -1,0 +1,1 @@
+@extends('layouts.app') @section('content')<form class="card p-8 max-w-md mx-auto" method="post" action="{{route('password.email')}}">@csrf<h1 class="serif text-3xl mb-6">Reset password</h1><label class="label" for="email">Email</label><input class="field" type="email" id="email" name="email" required><button class="button mt-5">Send reset link</button></form>@endsection

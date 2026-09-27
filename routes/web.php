@@ -1,0 +1,58 @@
+<?php
+use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\{StoreController,CartController,CheckoutController,PaymentController,AuthController,AccountController,AdminController};
+Route::get('/',[StoreController::class,'home'])->name('home');
+Route::get('/shop',[StoreController::class,'index'])->name('shop');
+Route::get('/categories/{category:slug}',[StoreController::class,'category'])->name('category');
+Route::get('/collections/{collection:slug}',[StoreController::class,'collection'])->name('collection');
+Route::get('/products/{product:slug}',[StoreController::class,'show'])->name('product');
+Route::get('/pages/{slug}',[StoreController::class,'page'])->name('page');
+Route::get('/size-guide',[StoreController::class,'sizeGuide'])->name('size-guide');
+Route::get('/sitemap.xml',[StoreController::class,'sitemap'])->name('sitemap');
+Route::post('/contact',[StoreController::class,'contact'])->middleware('throttle:5,1')->name('contact');
+Route::get('/cart',[CartController::class,'index'])->name('cart');
+Route::post('/cart',[CartController::class,'add'])->name('cart.add');
+Route::patch('/cart/{item}',[CartController::class,'update'])->name('cart.update');
+Route::delete('/cart/{item}',[CartController::class,'delete'])->name('cart.delete');
+Route::get('/checkout',[CheckoutController::class,'show'])->name('checkout');
+Route::post('/checkout',[CheckoutController::class,'place'])->middleware('throttle:10,1')->name('checkout.place');
+Route::get('/orders/{order}/payment',[PaymentController::class,'show'])->name('payment.show');
+Route::post('/orders/{order}/payment/confirm',[PaymentController::class,'confirm'])->middleware('throttle:10,1')->name('payment.confirm');
+Route::post('/payments/razorpay/webhook',[PaymentController::class,'webhook'])->name('payment.webhook');
+Route::get('/orders/{order}/status',[PaymentController::class,'status'])->name('order.status');
+Route::middleware('guest')->group(function () {
+    Route::get('/login',[AuthController::class,'loginForm'])->name('login');
+    Route::post('/login',[AuthController::class,'login'])->middleware('throttle:5,1');
+    Route::get('/register',[AuthController::class,'registerForm'])->name('register');
+    Route::post('/register',[AuthController::class,'register'])->middleware('throttle:5,1');
+    Route::get('/forgot-password',[AuthController::class,'forgotForm'])->name('password.request');
+    Route::post('/forgot-password',[AuthController::class,'forgot'])->name('password.email');
+    Route::get('/reset-password/{token}',[AuthController::class,'resetForm'])->name('password.reset');
+    Route::post('/reset-password',[AuthController::class,'reset'])->name('password.update');
+});
+Route::middleware('auth')->group(function () {
+    Route::post('/logout',[AuthController::class,'logout'])->name('logout');
+    Route::get('/account',[AccountController::class,'index'])->name('account');
+    Route::post('/account/addresses',[AccountController::class,'address'])->name('account.address');
+    Route::delete('/account/addresses/{address}',[AccountController::class,'deleteAddress'])->name('account.address.delete');
+    Route::get('/wishlist',[AccountController::class,'wishlist'])->name('wishlist');
+    Route::post('/wishlist/{product}',[AccountController::class,'toggleWishlist'])->name('wishlist.toggle');
+});
+Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(function () {
+    Route::get('/',[AdminController::class,'index'])->name('index');
+    Route::get('/products',[AdminController::class,'products'])->name('products');
+    Route::get('/products/create',[AdminController::class,'editProduct'])->name('product.create');
+    Route::get('/products/{product}/edit',[AdminController::class,'editProduct'])->name('product.edit');
+    Route::post('/products',[AdminController::class,'saveProduct'])->name('product.save');
+    Route::post('/products/{product}',[AdminController::class,'saveProduct'])->name('product.update');
+    Route::post('/products/{product}/images',[AdminController::class,'uploadImages'])->name('images.upload');
+    Route::delete('/images/{image}',[AdminController::class,'deleteImage'])->name('images.delete');
+    Route::post('/images/{image}/position',[AdminController::class,'reorderImage'])->name('images.position');
+    Route::get('/orders',[AdminController::class,'orders'])->name('orders');
+    Route::get('/orders/{order}',[AdminController::class,'order'])->name('order');
+    Route::post('/orders/{order}/status',[AdminController::class,'orderStatus'])->name('order.status');
+    Route::get('/settings',[AdminController::class,'settings'])->name('settings');
+    Route::post('/settings',[AdminController::class,'saveSettings'])->name('settings.save');
+    Route::get('/coupons',[AdminController::class,'coupons'])->name('coupons');
+    Route::post('/coupons',[AdminController::class,'saveCoupon'])->name('coupons.save');
+});
