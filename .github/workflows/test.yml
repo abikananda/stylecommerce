@@ -17,3 +17,4 @@ jobs:
         with:
           node-version: '22'
       - run: npm ci && npm run build
+      - run: docker build -t stylecommerce:test .
