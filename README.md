@@ -8,7 +8,7 @@ Requirements: PHP 8.3+, Composer 2, Node 22+, MySQL 8+, and a mail transport. Co
 
 ```bash
 composer install
-npm install
+npm ci
 php artisan key:generate
 php artisan migrate --seed
 php artisan storage:link

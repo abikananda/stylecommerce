@@ -1,7 +1,7 @@
 FROM node:22-alpine AS assets
 WORKDIR /app
 COPY package*.json vite.config.js ./
-RUN npm install
+RUN npm ci
 COPY resources ./resources
 RUN npm run build
 
