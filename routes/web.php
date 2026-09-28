@@ -55,6 +55,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth','admin'])->group(func
     Route::post('/orders/{order}/refund',[AdminController::class,'refund'])->name('order.refund');
     Route::get('/settings',[AdminController::class,'settings'])->name('settings');
     Route::post('/settings',[AdminController::class,'saveSettings'])->name('settings.save');
+    Route::post('/settings/logo',[AdminController::class,'uploadLogo'])->name('settings.logo');
     Route::get('/coupons',[AdminController::class,'coupons'])->name('coupons');
     Route::post('/coupons',[AdminController::class,'saveCoupon'])->name('coupons.save');
     Route::patch('/coupons/{coupon}',[AdminController::class,'updateCoupon'])->name('coupons.update');
