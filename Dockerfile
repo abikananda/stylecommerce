@@ -14,5 +14,6 @@ RUN mkdir -p storage/framework/cache/data storage/framework/sessions storage/fra
 COPY --from=assets /app/public/build /var/www/html/public/build
 RUN chmod +x /var/www/html/docker/start-web.sh
 RUN sed -ri 's!/var/www/html!/var/www/html/public!g' /etc/apache2/sites-available/000-default.conf
+RUN printf '<Directory /var/www/html/public>\n    AllowOverride All\n    Require all granted\n</Directory>\n' > /etc/apache2/conf-available/laravel.conf && a2enconf laravel
 EXPOSE 80
 CMD ["/var/www/html/docker/start-web.sh"]
