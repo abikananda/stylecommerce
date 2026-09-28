@@ -8,5 +8,9 @@ class Product extends Model {
     public function collection(){return $this->belongsTo(Collection::class);}
     public function variants(){return $this->hasMany(ProductVariant::class);}
     public function images(){return $this->hasMany(ProductImage::class)->orderBy('position');}
+    public function demoImageUrl(): ?string {
+        $path='images/demo/'.$this->slug.'.webp';
+        return is_file(public_path($path)) ? asset($path) : null;
+    }
     public function getRouteKeyName(): string {return 'slug';}
 }

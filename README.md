@@ -18,7 +18,7 @@ npm run build
 php artisan serve
 ```
 
-The demo product images are copied when the six sample products are first created. If you previously seeded these products without images, use the admin image upload screen to add images, or reset a disposable local database with `php artisan migrate:fresh --seed` (this deletes its data).
+The six demo photos are bundled in `public/images/demo`, so the storefront can show them even when an older local database has no image records. Run `php artisan db:seed` once to backfill image records for existing sample products and make them editable in admin. The storefront also falls back to bundled photos if a storage symlink is missing. After uploading your own product photos, they take priority.
 
 In separate shells run `php artisan queue:work` and `php artisan schedule:work`. Open `http://localhost:8000`. The admin login is the email and password supplied for seeding, and the admin UI is at `/admin`. Re-running the seeder does not overwrite an existing admin password.
 
