@@ -1,10 +1,12 @@
 # Jewellery store
 
-Laravel 13 storefront and admin for earrings and bangles, with per-variant stock, guest checkout, a Razorpay payment path, and configurable store details. The demo catalogue and hero photo are illustrative; replace the products, descriptions and images with your real merchandise before publishing.
+Laravel 13 storefront and admin for earrings and bangles, with per-variant stock, guest checkout, a Razorpay payment path, and configurable store details. Six illustrative product photos in `public/images/demo` are copied into public storage during a fresh seed. Replace the demo products, descriptions and images with your real merchandise before publishing.
 
 ## Local setup
 
 Requirements: PHP 8.3+ with GD, Composer 2, Node 22+, MySQL 8+, and a mail transport. Copy `.env.example` to `.env`; set database credentials, `APP_URL`, `ADMIN_EMAIL`, and a strong `ADMIN_PASSWORD` before seeding. Never commit `.env`.
+
+On Windows, enable `fileinfo`, `pdo_mysql`, `gd`, `zip`, and `openssl` in the PHP configuration used by the command line. Check with `php -m` and `php --ini` before running Composer or migrations. Start MySQL and create the database named in `.env`; `could not find driver` means `pdo_mysql` is not enabled for that PHP installation.
 
 ```bash
 composer install
@@ -15,6 +17,8 @@ php artisan storage:link
 npm run build
 php artisan serve
 ```
+
+The demo product images are copied when the six sample products are first created. If you previously seeded these products without images, use the admin image upload screen to add images, or reset a disposable local database with `php artisan migrate:fresh --seed` (this deletes its data).
 
 In separate shells run `php artisan queue:work` and `php artisan schedule:work`. Open `http://localhost:8000`. The admin login is the email and password supplied for seeding, and the admin UI is at `/admin`. Re-running the seeder does not overwrite an existing admin password.
 
