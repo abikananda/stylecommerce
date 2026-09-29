@@ -33,7 +33,7 @@
         </details>
     </aside>
     <div class="catalogue-results">
-        <div class="results-bar"><span>{{$products->total()}} {{\\Illuminate\\Support\\Str::plural('piece',$products->total())}}</span><span>Thoughtfully chosen for you</span></div>
+        <div class="results-bar"><span>{{$products->total()}} {{ $products->total() === 1 ? 'piece' : 'pieces' }}</span><span>Thoughtfully chosen for you</span></div>
         @if($products->count())
         <div class="grid-products">@foreach($products as $item)@include('store._card')@endforeach</div>
         <div class="pagination-wrap">{{$products->links()}}</div>
